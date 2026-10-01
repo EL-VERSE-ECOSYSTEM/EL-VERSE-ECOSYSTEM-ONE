@@ -20,7 +20,7 @@ export default function ElcodersHomePage() {
         <h2 style={{ fontSize: '3.5rem', fontWeight: 800, background: 'linear-gradient(135deg, #0066FF 0%, #00D4FF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           Your Idea + Our Code = Scalable Success
         </h2>
-        <p style={{ fontSize: '1.25rem', color: '#9A9AAE', maxW: '600px', margin: '1rem auto' }}>
+        <p style={{ fontSize: '1.25rem', color: '#9A9AAE', maxWidth: '600px', margin: '1rem auto' }}>
           24hr First Commit Guarantee. 12+ MVPs Shipped, 500+ Hours Code Delivered, 98% Client Satisfaction.
         </p>
         <button style={{ padding: '1rem 2rem', fontSize: '1rem', background: 'linear-gradient(135deg, #0066FF 0%, #00D4FF 100%)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: 600, cursor: 'pointer' }}>

@@ -8,3 +8,5 @@ build
 .env.local
 bin
 public/assets
+next-env.d.ts
+tsconfig.json
