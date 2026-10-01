@@ -116,9 +116,27 @@ GRANT ALL ON crm_deals TO authenticated;
 GRANT ALL ON disputes TO authenticated;
 GRANT ALL ON notifications TO authenticated;
 
+-- Row Level Security Policies
+CREATE POLICY "Users view open internships" ON internships
+FOR SELECT TO authenticated
+USING (status = 'open' AND deleted_at IS NULL);
+
+CREATE POLICY "Company manages own internships" ON internships
+FOR ALL TO authenticated
+USING ((select auth.uid()) = company_id)
+WITH CHECK ((select auth.uid()) = company_id);
+
 CREATE POLICY "Users view own transactions" ON transactions
 FOR SELECT TO authenticated
 USING ((select auth.uid()) = user_id);
+
+CREATE POLICY "Users view own messages" ON messages
+FOR SELECT TO authenticated
+USING ((select auth.uid()) = sender_id);
+
+CREATE POLICY "Users insert own messages" ON messages
+FOR INSERT TO authenticated
+WITH CHECK ((select auth.uid()) = sender_id);
 
 CREATE POLICY "Users view own notifications" ON notifications
 FOR SELECT TO authenticated
@@ -129,7 +147,23 @@ FOR ALL TO authenticated
 USING ((select auth.uid()) = owner_id)
 WITH CHECK ((select auth.uid()) = owner_id);
 
+CREATE POLICY "Users view workflow runs" ON workflow_runs
+FOR SELECT TO authenticated
+USING (workflow_id IN (SELECT id FROM workflows WHERE owner_id = (select auth.uid())));
+
 CREATE POLICY "Users view own ai conversations" ON ai_conversations
 FOR ALL TO authenticated
 USING ((select auth.uid()) = user_id)
 WITH CHECK ((select auth.uid()) = user_id);
+
+CREATE POLICY "Admins view all crm leads" ON crm_leads
+FOR ALL TO authenticated
+USING (true);
+
+CREATE POLICY "Admins view all crm deals" ON crm_deals
+FOR ALL TO authenticated
+USING (true);
+
+CREATE POLICY "Participants view disputes" ON disputes
+FOR SELECT TO authenticated
+USING ((select auth.uid()) = raised_by);
