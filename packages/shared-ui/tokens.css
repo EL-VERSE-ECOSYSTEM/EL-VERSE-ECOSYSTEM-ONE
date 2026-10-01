@@ -1,0 +1,119 @@
+:root {
+  /* Neutral Scale */
+  --elv-black: #050507;
+  --elv-gray-950: #0A0A0F;
+  --elv-gray-900: #12121A;
+  --elv-gray-800: #1C1C28;
+  --elv-gray-700: #2A2A3A;
+  --elv-gray-600: #3F3F52;
+  --elv-gray-500: #6B6B80;
+  --elv-gray-400: #9A9AAE;
+  --elv-gray-300: #C4C4D4;
+  --elv-gray-200: #E0E0EA;
+  --elv-gray-100: #F4F4F8;
+  --elv-white: #FFFFFF;
+
+  /* Semantic Colors */
+  --elv-success: #10B981;
+  --elv-warning: #F59E0B;
+  --elv-error: #EF4444;
+  --elv-info: #3B82F6;
+
+  /* Fonts */
+  --font-display: 'Clash Display', 'Satoshi', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg-hover: rgba(255, 255, 255, 0.10);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-blur: blur(20px) saturate(180%);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
+
+  /* Default Arm: EL VERSE Parent */
+  --arm-primary: #0F172A;
+  --arm-secondary: #6366F1;
+  --arm-accent: #F59E0B;
+  --arm-rgb: 15, 23, 42;
+  --arm-secondary-rgb: 99, 102, 241;
+  --arm-gradient: linear-gradient(135deg, #0F172A 0%, #6366F1 50%, #F59E0B 100%);
+  --glow-arm: 0 0 40px rgba(99, 102, 241, 0.35);
+}
+
+/* Arm-specific tokens */
+[data-arm="elcoders"] {
+  --arm-primary: #0066FF;
+  --arm-secondary: #00D4FF;
+  --arm-accent: #7B61FF;
+  --arm-rgb: 0, 102, 255;
+  --arm-secondary-rgb: 0, 212, 255;
+  --arm-gradient: linear-gradient(135deg, #0066FF 0%, #00D4FF 100%);
+  --glow-arm: 0 0 40px rgba(0, 102, 255, 0.35);
+}
+
+[data-arm="elites"] {
+  --arm-primary: #8B5CF6;
+  --arm-secondary: #F59E0B;
+  --arm-accent: #EC4899;
+  --arm-rgb: 139, 92, 246;
+  --arm-secondary-rgb: 245, 158, 11;
+  --arm-gradient: linear-gradient(135deg, #8B5CF6 0%, #F59E0B 100%);
+  --glow-arm: 0 0 40px rgba(139, 92, 246, 0.35);
+}
+
+[data-arm="elspace"] {
+  --arm-primary: #10B981;
+  --arm-secondary: #06B6D4;
+  --arm-accent: #84CC16;
+  --arm-rgb: 16, 185, 129;
+  --arm-secondary-rgb: 6, 182, 212;
+  --arm-gradient: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+  --glow-arm: 0 0 40px rgba(16, 185, 129, 0.35);
+}
+
+[data-arm="elaccess"] {
+  --arm-primary: #F97316;
+  --arm-secondary: #EAB308;
+  --arm-accent: #EF4444;
+  --arm-rgb: 249, 115, 22;
+  --arm-secondary-rgb: 234, 179, 8;
+  --arm-gradient: linear-gradient(135deg, #F97316 0%, #EAB308 100%);
+  --glow-arm: 0 0 40px rgba(249, 115, 22, 0.35);
+}
+
+[data-arm="nexel"] {
+  --arm-primary: #EC4899;
+  --arm-secondary: #8B5CF6;
+  --arm-accent: #06B6D4;
+  --arm-rgb: 236, 72, 153;
+  --arm-secondary-rgb: 139, 92, 246;
+  --arm-gradient: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%);
+  --glow-arm: 0 0 40px rgba(236, 72, 153, 0.35);
+}
+
+/* Glass Card & Neo-Glassmorphism Classes */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: var(--arm-gradient);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15), var(--glow-arm);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+}
