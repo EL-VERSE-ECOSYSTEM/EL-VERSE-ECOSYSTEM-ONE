@@ -19,9 +19,21 @@ export default function ElitesHomePage() {
         <h2 style={{ fontSize: '3.5rem', fontWeight: 800, background: 'linear-gradient(135deg, #8B5CF6 0%, #F59E0B 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           Stop Watching Tutorials. Start Building with a Mentor.
         </h2>
-        <p style={{ fontSize: '1.25rem', color: '#9A9AAE', maxW: '600px', margin: '1rem auto' }}>
+        <p style={{ fontSize: '1.25rem', color: '#9A9AAE', maxWidth: '600px', margin: '1rem auto' }}>
           50+ Senior Developers, 500+ Active Learners, 200+ Projects Shipped.
         </p>
+      </section>
+
+      <section id="mentors" style={{ margin: '4rem 0' }}>
+        <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: '#8B5CF6' }}>Featured Mentors</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+          {['Senior Fullstack Architect', 'Cloud Native Lead', 'AI Systems Engineer'].map((role, i) => (
+            <div key={i} style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '16px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <h4 style={{ margin: '0 0 0.5rem 0' }}>Mentor #{i + 1}</h4>
+              <p style={{ color: '#9A9AAE', fontSize: '0.9rem', margin: 0 }}>{role}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </main>
   );
