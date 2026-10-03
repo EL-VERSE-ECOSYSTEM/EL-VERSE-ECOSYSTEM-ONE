@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   full_name TEXT NOT NULL,
   avatar_url TEXT,
   role TEXT NOT NULL CHECK (role IN ('learner', 'tutor', 'freelancer', 'client', 'intern', 'company', 'admin')),
+  status TEXT DEFAULT 'active',
+  last_active_at TIMESTAMPTZ DEFAULT NOW(),
   tenant_id UUID,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),

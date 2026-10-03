@@ -1,7 +1,5 @@
 import './tokens.css';
 
-export * from './tokens.css';
-
 export const BRAND_CONFIGS = {
   elcoders: { name: 'ELCODERS', primaryColor: '#0066FF', logo: '/assets/elcoders-logo.webp' },
   elites: { name: 'ELITES', primaryColor: '#8B5CF6', logo: '/assets/elites-logo.jpeg' },

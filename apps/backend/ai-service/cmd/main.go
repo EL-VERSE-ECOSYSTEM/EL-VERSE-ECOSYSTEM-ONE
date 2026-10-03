@@ -1,78 +1,72 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+
+	"github.com/elverse/ai-service/internal/inference"
 )
 
-type PersonaConfig struct {
-	Name       string   `json:"name"`
-	Arm        string   `json:"arm"`
-	Role       string   `json:"role"`
-	Scope      string   `json:"scope"`
-	Tools      []string `json:"tools"`
-	SystemMsg  string   `json:"system_msg"`
-}
-
-var Personas = map[string]PersonaConfig{
-	"menato": {
-		Name:      "Menato",
-		Arm:       "ELITES",
-		Role:      "Learning companion and mentor matcher",
-		Scope:     "Course recommendation, mentor matching, learning path generation, content Q&A",
-		Tools:     []string{"search_courses", "get_mentor_profile", "generate_learning_path", "enroll_course"},
-		SystemMsg: "You are Menato, the official AI mentor for ELITES.",
-	},
-	"spectre": {
-		Name:      "Spectre",
-		Arm:       "ELSPACE",
-		Role:      "Freelance matching and project scoping assistant",
-		Scope:     "Freelancer-client matching, proposal drafting, project scoping, dispute mediation",
-		Tools:     []string{"search_freelancers", "draft_proposal", "estimate_project", "open_dispute"},
-		SystemMsg: "You are Spectre, the freelance AI assistant for ELSPACE.",
-	},
-	"nelly": {
-		Name:      "Nelly",
-		Arm:       "NEXEL",
-		Role:      "Community moderator and feed curator",
-		Scope:     "Content moderation, feed ranking, community summarization, spam detection",
-		Tools:     []string{"moderate_content", "rank_feed", "summarize_thread", "flag_spam"},
-		SystemMsg: "You are Nelly, the community AI moderator for NEXEL.",
-	},
-	"elly": {
-		Name:      "Elly",
-		Arm:       "ELCODERS + EL ACCESS + AI Agent",
-		Role:      "General platform assistant and code reviewer",
-		Scope:     "Code review, project estimation, internship matching, general platform Q&A",
-		Tools:     []string{"review_code", "estimate_project", "match_internship", "query_platform"},
-		SystemMsg: "You are Elly, the master AI assistant across EL VERSE.",
-	},
+type ChatRequest struct {
+	Persona string           `json:"persona"`
+	Message string           `json:"message"`
+	History []map[string]any `json:"history"`
+	Context map[string]any   `json:"context"`
 }
 
 func main() {
-	http.HandleFunc("/v1/ai/chat", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		persona := r.URL.Query().Get("persona")
-		if persona == "" {
-			persona = "elly"
-		}
-		p, exists := Personas[persona]
-		if !exists {
-			http.Error(w, "Unknown persona", http.StatusBadRequest)
+	client := inference.NewInferenceClient()
+
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]string{"status": "ok", "service": "ai-service"})
+	})
+
+	http.HandleFunc("/v1/ai/chat/stream", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"persona": p,
-			"response": fmt.Sprintf("[%s AI Agent]: Hello! How can I assist you in the %s ecosystem today?", p.Name, p.Arm),
+
+		var req ChatRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+			return
+		}
+
+		w.Header().Set("Content-Type", "text/event-stream")
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("Connection", "keep-alive")
+
+		resp, err := client.StreamChat(inference.ChatRequest{
+			Persona: req.Persona,
+			Message: req.Message,
+			History: req.History,
+			Context: req.Context,
 		})
+		if err != nil {
+			fmt.Fprintf(w, "data: {\"type\": \"error\", \"error\": \"Inference service unavailable\"}\n\n")
+			return
+		}
+		defer resp.Body.Close()
+
+		flusher, ok := w.(http.Flusher)
+		scanner := bufio.NewScanner(resp.Body)
+		for scanner.Scan() {
+			fmt.Fprintf(w, "%s\n", scanner.Text())
+			if ok {
+				flusher.Flush()
+			}
+		}
 	})
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "10003"
 	}
-	fmt.Printf("AI Service listening on :%s\n", port)
-	http.ListenAndServe(":"+port, nil)
+	fmt.Printf("ai-service listening on :%s\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

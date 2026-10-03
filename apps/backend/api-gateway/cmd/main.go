@@ -63,7 +63,7 @@ func main() {
 	app.All("/v1/crm/*", proxyService("http://localhost:10006"))
 	app.All("/v1/courses/*", proxyService("http://localhost:10007"))
 	app.All("/v1/jobs/*", proxyService("http://localhost:10008"))
-	app.All("/v1/analytics/*", middleware.AdminOnlyMiddleware(), proxyService("http://localhost:10009"))
+	app.All("/v1/analytics/*", middleware.RequireAdmin(), proxyService("http://localhost:10009"))
 
 	log.Printf("API Gateway listening on 0.0.0.0:%s", cfg.Port)
 	if err := app.Listen(":" + cfg.Port); err != nil {
