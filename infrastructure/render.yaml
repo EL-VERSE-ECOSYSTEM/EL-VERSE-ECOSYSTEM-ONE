@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: elverse-api-gateway
+    env: go
+    buildCommand: go build -o bin/api-gateway ./apps/backend/api-gateway/cmd
+    startCommand: ./bin/api-gateway
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: GO_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: VALKEY_URL
+        fromService:
+          name: elverse-valkey
+          type: redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: KORAPAY_SECRET_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: SUPABASE_URL
+        value: https://kipafxeitjrlqtdhzhse.supabase.co
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+  - type: web
+    name: elverse-messaging-service
+    env: go
+    buildCommand: go build -o bin/messaging-service ./apps/backend/messaging-service/cmd
+    startCommand: ./bin/messaging-service
+    envVars:
+      - key: PORT
+        value: 10005
+      - key: GO_ENV
+        value: production
+
+databases:
+  - name: elverse-db
+    plan: starter
+    postgresMajorVersion: 15
+
+services:
+  - type: redis
+    name: elverse-valkey
+    plan: starter
+    ipAllowList: []

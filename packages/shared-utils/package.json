@@ -1,0 +1,7 @@
+{
+  "name": "@elverse/shared-utils",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.ts",
+  "types": "index.ts"
+}

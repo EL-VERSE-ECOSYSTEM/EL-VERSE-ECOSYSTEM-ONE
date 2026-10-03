@@ -1,0 +1,24 @@
+openapi: 3.0.3
+info:
+  title: EL VERSE ECOSYSTEM API
+  version: 1.0.0
+  description: Complete OpenAPI 3.0 specification for EL VERSE microservices.
+paths:
+  /v1/auth/login:
+    post:
+      summary: User Login
+      responses:
+        '200':
+          description: Successful auth
+  /v1/webhooks/korapay:
+    post:
+      summary: Korapay Webhook
+      responses:
+        '200':
+          description: Webhook received
+  /v1/webhooks/paystack:
+    post:
+      summary: Paystack Webhook
+      responses:
+        '200':
+          description: Webhook received
