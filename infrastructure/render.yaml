@@ -27,6 +27,17 @@ services:
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
 
+  - type: web
+    name: elverse-messaging-service
+    env: go
+    buildCommand: go build -o bin/messaging-service ./apps/backend/messaging-service/cmd
+    startCommand: ./bin/messaging-service
+    envVars:
+      - key: PORT
+        value: 10005
+      - key: GO_ENV
+        value: production
+
 databases:
   - name: elverse-db
     plan: starter
