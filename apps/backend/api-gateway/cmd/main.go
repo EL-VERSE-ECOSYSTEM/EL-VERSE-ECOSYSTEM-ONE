@@ -21,12 +21,13 @@ func main() {
 		AppName: "EL VERSE API Gateway",
 	})
 
-	// Middleware registration order
+	// Security middleware stack (Helmet headers first, requestid, logger, CORS, rate limiter)
+	app.Use(middleware.SecurityHeadersMiddleware())
 	app.Use(logger.New())
 	app.Use(requestid.New())
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: cfg.AllowedOrigins,
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-CSRF-Token",
 	}))
 	app.Use(limiter.New(limiter.Config{
 		Max:        100,

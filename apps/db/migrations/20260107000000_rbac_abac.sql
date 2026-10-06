@@ -53,12 +53,12 @@ GRANT SELECT ON rbac_permissions TO authenticated;
 GRANT SELECT ON rbac_user_roles TO authenticated;
 GRANT SELECT ON abac_policies TO authenticated;
 
--- RBAC Permission Check Function
+-- RBAC Permission Check Function (Harden with SET search_path = public)
 CREATE OR REPLACE FUNCTION has_permission(
     p_user_id UUID,
     p_permission TEXT
 ) RETURNS BOOLEAN
-LANGUAGE sql STABLE SECURITY DEFINER
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
 AS $$
     SELECT EXISTS (
         SELECT 1
@@ -70,14 +70,14 @@ AS $$
     );
 $$;
 
--- ABAC Evaluation Function (Evaluates policies in priority order with default DENY)
+-- ABAC Evaluation Function (Evaluates policies in priority order with default DENY & SET search_path = public)
 CREATE OR REPLACE FUNCTION abac_check(
     p_user_id UUID,
     p_resource_type TEXT,
     p_resource_id UUID,
     p_action TEXT
 ) RETURNS BOOLEAN
-LANGUAGE plpgsql STABLE SECURITY DEFINER
+LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public
 AS $$
 DECLARE
     v_policy RECORD;
