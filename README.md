@@ -140,7 +140,70 @@ elverse-ecosystem/
 
 ---
 
-## 🚀 Quick Start & Local Development
+## 📋 Complete Feature & Logic Master List (~460 Feature Specifications)
+
+### 1. Authentication & Identity
+* **AUTH-001 Email + Password Signup:** Full name, email, password validation (min 8 chars, 1 upper, 1 lower, 1 digit, 1 symbol).
+* **AUTH-002 Username Selection:** Unique, 3–30 chars, alphanumeric + underscore.
+* **AUTH-003 Email Uniqueness:** Generic response to prevent enumeration attacks.
+* **AUTH-004 Email Verification:** Link verification via Supabase Auth (24h expiry).
+* **AUTH-009 Direct Link Auth:** No SMS or email OTP codes; authentication is strictly link-based.
+* **AUTH-010 Disabled OAuth:** Third-party OAuth (Google, Apple, GitHub) explicitly disabled.
+* **AUTH-020 Unified Login:** Single auth portal (`auth.elverse.com`) for all arms.
+* **AUTH-024 Session Creation:** Access token (1h) + refresh token (7d).
+* **AUTH-026 Session Limits:** Max 5 concurrent active sessions per user.
+
+### 2. Unified Login & Real-Time Role Redirection
+* **ROLE-001 Unified Portal:** `auth.elverse.com/login` routes users globally across all subdomains.
+* **ROLE-010 Role Querying:** Fetches all active assignments from `rbac_user_roles`.
+* **ROLE-020 Real-Time Role Updates:** Supabase Realtime DB triggers on `rbac_user_roles` broadcast to `user:{userId}`.
+* **ROLE-022 Role Revocation:** Invalidates active user session and redirects to `/role-revoked`.
+* **ROLE-026 Gateway Caching:** Go API Gateway subscribes to `rbac:updated` WebSocket channel to flush permission cache instantly.
+
+### 3. ELITES — Mentorship & Learning Arm
+* **ELITES-001 Course Catalog:** Paginated grid with stack, rank, and duration filters.
+* **ELITES-003 Rank Gating:** Learners see and enroll only in courses at or below their rank per stack.
+* **ELITES-021 Payments:** Integrated Korapay & Paystack checkout with instant enrollment webhook callback.
+* **ELITES-046 3D IDE Simulator:** Monaco editor integration with real-time AI code review.
+* **ELITES-060 Menato AI Mentor:** Streaming Socratic guidance, learning path generation, and course enrollment tool calls.
+* **ELITES-100 Per-Stack Rank System:** Ranks E (Novice) to S (Elite) stored in `profiles.ranks` JSONB.
+
+### 4. ELCODERS — Software Development Arm
+* **ELCODERS-001 Services & Products:** Pre-packaged development services and 20+ ready-to-deploy products.
+* **ELCODERS-004 Elly AI Scoping:** Estimates project hours, budget, and milestone timelines from requirement briefs.
+* **ELCODERS-022 Developer Assignment:** Senior Developer assignment by Arm MD with Junior Developer delegation.
+* **ELCODERS-028 Deliverable Management:** Git commit links, file attachments, and client approval tracking.
+* **ELCODERS-057 AI Code Review:** Elly reviews code submissions prior to client review.
+
+### 5. ELSPACE — Freelance Marketplace Arm
+* **ELSPACE-001 Talent Directory:** Verified skill badges, portfolio displays, and hourly rates.
+* **ELSPACE-004 Spectre AI Proposals:** Auto-drafts bids tailored to gig briefs.
+* **ELSPACE-007 Milestone Escrow:** Platform holds funds in escrow until milestone deliverable approval.
+* **ELSPACE-011 Payouts:** Automated bulk payouts via Korapay to bank accounts.
+* **ELSPACE-050 Dispute Mediation:** Escalation workflow with private mediation channels.
+
+### 6. EL ACCESS — Internship Placement Arm
+* **ELACCESS-001 Internship Board:** Verified company internship listings with stipend tracking.
+* **ELACCESS-002 Elly AI Matching:** Skill and rank-based candidate matching.
+* **ELACCESS-007 Intern Dashboard:** Task completion logs, hours tracking, and mentor interaction.
+
+### 7. NEXEL — Social Community & Content Arm
+* **NEXEL-001 Nelly AI Feed:** Feed ranking by relevance, recency, and engagement metrics.
+* **NEXEL-050 Topic Channels:** Public and private channels with verified account creation rights.
+* **NEXEL-070 Messaging Engine:** Direct messages and group chats via private WebSocket channels.
+* **NEXEL-090 Nelly AI Moderation:** Real-time auto-flagging of banned terms, spam, and threats.
+* **NEXEL-110 Creator Subscriptions:** Tiered monthly memberships with recurring payments.
+
+### 8. Dashboards & System Operations
+* **Business Dashboard:** Executive command center displaying real-time platform KPIs, MRR/ARR, and service health.
+* **Support Dashboard:** Ticket queue with SLA gauges, priority filters, and automated breach escalations.
+* **Admin Panel:** Global user management, RBAC/ABAC policy editor, impersonation audit, and feature flag toggles.
+* **CRM System:** Lead scoring, deal pipeline tracking, and contact history.
+* **Automation Builder:** Drag-and-drop workflow canvas (React Flow) supporting scheduled triggers, AI prompts, and HTTP webhooks.
+
+---
+
+## 🛠️ Quick Start & Local Development
 
 ### Prerequisites
 * **Node.js:** `>= 20.x`
@@ -200,7 +263,7 @@ services:
 
 ---
 
-## 📄 License
+## 📜 License
 
 This repository is proprietary software licensed under the **MIT License**. See the [LICENSE](LICENSE) file for complete details.
 
