@@ -1,4 +1,5 @@
 import './tokens.css';
+export { ThemeToggle } from './theme-toggle';
 
 export const BRAND_CONFIGS = {
   elcoders: { name: 'ELCODERS', primaryColor: '#0066FF', logo: '/assets/elcoders-logo.webp' },

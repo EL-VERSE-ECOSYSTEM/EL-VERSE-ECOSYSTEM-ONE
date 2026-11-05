@@ -1,10 +1,13 @@
 import React from 'react';
+import { ThemeToggle } from '@elverse/shared-ui';
+import './globals.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0, backgroundColor: '#050507', color: '#FFFFFF', fontFamily: 'sans-serif' }}>
+      <body>
         {children}
+        <ThemeToggle />
       </body>
     </html>
   );
