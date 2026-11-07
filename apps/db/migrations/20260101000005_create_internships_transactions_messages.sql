@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS internships (
 CREATE TABLE IF NOT EXISTS transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
-  provider TEXT NOT NULL CHECK (provider IN ('korapay', 'paystack')),
+  provider TEXT NOT NULL CHECK (provider IN ('paystack')),
   reference TEXT NOT NULL UNIQUE,
   amount NUMERIC(10, 2) NOT NULL,
   currency TEXT NOT NULL DEFAULT 'USD',

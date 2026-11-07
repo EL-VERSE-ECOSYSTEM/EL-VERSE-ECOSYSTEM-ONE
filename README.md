@@ -77,8 +77,7 @@ The EL VERSE ECOSYSTEM enforces defense-in-depth authorization using a **hybrid 
 ```
 
 ### 💳 Payment Webhook Verification Rules
-* **Paystack Webhooks:** Validated using HMAC SHA-512 calculated over the raw request body with constant-time signature comparison (`hmac.Equal`).
-* **Korapay Webhooks:** Validated using HMAC SHA-256 calculated over the `data` object within the JSON payload.
+* **Paystack Webhooks:** Validated using HMAC SHA-512 calculated over the raw request body with constant-time signature comparison (`hmac.Equal`). Includes idempotent event processing and real-time transaction verification.
 
 ---
 
@@ -110,7 +109,7 @@ elverse-ecosystem/
 │   │   ├── auth-service/             # Supabase Auth Integration & Profile Management
 │   │   ├── ai-service/               # Go Orchestrator for AI Agent Tools & SSE Relays
 │   │   ├── ai-inference/             # Python FastAPI Inference & pgvector RAG
-│   │   ├── payment-service/          # Korapay & Paystack Webhook Handler & Escrow
+│   │   ├── payment-service/          # Paystack Checkout & Webhook Handler & Escrow
 │   │   ├── messaging-service/        # Fiber WebSocket Engine with Channel Subscriptions
 │   │   ├── notification-service/     # Multi-Channel Alert & Supabase Notification Hub
 │   │   ├── course-service/           # ELITES Course Catalog & Progress Tracker
@@ -163,7 +162,7 @@ elverse-ecosystem/
 ### 3. ELITES — Mentorship & Learning Arm
 * **ELITES-001 Course Catalog:** Paginated grid with stack, rank, and duration filters.
 * **ELITES-003 Rank Gating:** Learners see and enroll only in courses at or below their rank per stack.
-* **ELITES-021 Payments:** Integrated Korapay & Paystack checkout with instant enrollment webhook callback.
+* **ELITES-021 Payments:** Integrated Paystack checkout with instant enrollment webhook callback.
 * **ELITES-046 3D IDE Simulator:** Monaco editor integration with real-time AI code review.
 * **ELITES-060 Menato AI Mentor:** Streaming Socratic guidance, learning path generation, and course enrollment tool calls.
 * **ELITES-100 Per-Stack Rank System:** Ranks E (Novice) to S (Elite) stored in `profiles.ranks` JSONB.
@@ -179,7 +178,7 @@ elverse-ecosystem/
 * **ELSPACE-001 Talent Directory:** Verified skill badges, portfolio displays, and hourly rates.
 * **ELSPACE-004 Spectre AI Proposals:** Auto-drafts bids tailored to gig briefs.
 * **ELSPACE-007 Milestone Escrow:** Platform holds funds in escrow until milestone deliverable approval.
-* **ELSPACE-011 Payouts:** Automated bulk payouts via Korapay to bank accounts.
+* **ELSPACE-011 Payouts:** Automated payouts via Paystack to bank accounts.
 * **ELSPACE-050 Dispute Mediation:** Escalation workflow with private mediation channels.
 
 ### 6. EL ACCESS — Internship Placement Arm

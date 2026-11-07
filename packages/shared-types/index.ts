@@ -49,7 +49,7 @@ export interface Proposal {
 export interface Transaction {
   id: string;
   user_id: string;
-  provider: 'korapay' | 'paystack';
+  provider: 'paystack';
   reference: string;
   amount: number;
   currency: string;
