@@ -16,7 +16,7 @@ const milestones = [
 const deliverables = [
   { name: 'Frontend onboarding flow', progress: 88, tag: 'Design review' },
   { name: 'Role-based access system', progress: 72, tag: 'QA pass' },
-  { name: 'Stripe + Korapay sync', progress: 56, tag: 'Pending webhook checks' },
+  { name: 'Stripe + Paystack sync', progress: 56, tag: 'Pending webhook checks' },
 ];
 
 const invoices = [

@@ -10,15 +10,21 @@ paths:
       responses:
         '200':
           description: Successful auth
-  /v1/webhooks/korapay:
-    post:
-      summary: Korapay Webhook
-      responses:
-        '200':
-          description: Webhook received
   /v1/webhooks/paystack:
     post:
       summary: Paystack Webhook
       responses:
         '200':
           description: Webhook received
+  /v1/payments/initialize:
+    post:
+      summary: Initialize Paystack Checkout
+      responses:
+        '200':
+          description: Checkout session initialized
+  /v1/payments/callback:
+    get:
+      summary: Paystack Payment Callback / Verification
+      responses:
+        '200':
+          description: Payment verification status
