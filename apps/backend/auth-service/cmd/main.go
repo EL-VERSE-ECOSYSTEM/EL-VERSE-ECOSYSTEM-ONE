@@ -18,12 +18,20 @@ type JWTClaims struct {
 }
 
 func IssueToken(userID, email, role, tenantID, secret string) (string, error) {
+	// Standardize role into app_metadata.user_role as required by Blueprint v3.0.0
+	// ('client', 'developer', 'staff', 'admin')
+	blueprintRole := role
+	if blueprintRole == "learner" || blueprintRole == "freelancer" || blueprintRole == "intern" {
+		blueprintRole = "client"
+	}
+
 	claims := JWTClaims{
 		Email: email,
 		Role:  role,
 		AppMetadata: map[string]interface{}{
 			"tenant_id": tenantID,
 			"org_role":  "member",
+			"user_role": blueprintRole,
 		},
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   userID,
@@ -42,7 +50,7 @@ func main() {
 		if secret == "" {
 			secret = "default-secret-key"
 		}
-		tokenStr, err := IssueToken("user-123", "learner@elverse.com", "learner", "org-456", secret)
+		tokenStr, err := IssueToken("user-123", "client@elverse.com", "client", "org-456", secret)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

@@ -1,11 +1,20 @@
-export type UserRole = 'learner' | 'tutor' | 'freelancer' | 'client' | 'intern' | 'company' | 'admin';
+// Ecosystem User Roles per v3.0.0 Blueprint: client, developer, staff, admin
+// (legacy roles preserved for backward compatibility)
+export type BlueprintUserRole = 'client' | 'developer' | 'staff' | 'admin';
+export type LegacyUserRole = 'learner' | 'tutor' | 'freelancer' | 'intern' | 'company';
+export type UserRole = BlueprintUserRole | LegacyUserRole;
+
+export type ArmName = 'ELCODERS' | 'EL ACCESS' | 'ELITES' | 'EL SPACE' | 'NEXEL';
 
 export interface UserProfile {
   id: string;
-  user_id: string;
+  user_id?: string;
+  email?: string;
   full_name: string;
   avatar_url?: string;
-  role: UserRole;
+  user_role?: BlueprintUserRole;
+  role?: UserRole;
+  arm_access?: ArmName[] | string[];
   created_at: string;
 }
 
