@@ -13,8 +13,17 @@ func RequireAdmin() fiber.Handler {
 			})
 		}
 
+		// Check direct role claim
 		role, _ := user["role"].(string)
-		if role != "admin" && role != "super_admin" {
+
+		// Also check Supabase app_metadata.user_role per Blueprint v3.0.0
+		if appMeta, hasMeta := user["app_metadata"].(map[string]interface{}); hasMeta {
+			if metaRole, okMeta := appMeta["user_role"].(string); okMeta && metaRole != "" {
+				role = metaRole
+			}
+		}
+
+		if role != "admin" && role != "super_admin" && role != "staff" {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 				"error": "Admin access required",
 			})
