@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/elverse/payment-service/internal/idempotency"
 	"github.com/elverse/payment-service/internal/provider"
@@ -36,17 +37,45 @@ type PaystackVerifyResponse struct {
 	Status  bool   `json:"status"`
 	Message string `json:"message"`
 	Data    struct {
-		ID        int64  `json:"id"`
-		Status    string `json:"status"`
-		Reference string `json:"reference"`
-		Amount    int64  `json:"amount"`
+		ID              int64  `json:"id"`
+		Status          string `json:"status"`
+		Reference       string `json:"reference"`
+		Amount          int64  `json:"amount"`
 		GatewayResponse string `json:"gateway_response"`
-		Channel   string `json:"channel"`
-		Currency  string `json:"currency"`
-		Customer  struct {
+		Channel         string `json:"channel"`
+		Currency        string `json:"currency"`
+		Customer        struct {
 			Email string `json:"email"`
 		} `json:"customer"`
 	} `json:"data"`
+}
+
+// broadcastRealtimePayment sends an event notification for live real-time listeners across apps
+func broadcastRealtimePayment(reference, status string, amount int64, event string) {
+	notificationURL := os.Getenv("NOTIFICATION_SERVICE_URL")
+	if notificationURL == "" {
+		notificationURL = "http://localhost:10005/v1/notifications"
+	}
+
+	payload := map[string]interface{}{
+		"user_id": "broadcast_payments",
+		"title":   fmt.Sprintf("Payment %s: %s", status, reference),
+		"body":    fmt.Sprintf("Paystack transaction %s status is %s (Amount: %d)", reference, status, amount),
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return
+	}
+
+	client := &http.Client{Timeout: 2 * time.Second}
+	req, err := http.NewRequest(http.MethodPost, notificationURL, bytes.NewReader(body))
+	if err == nil {
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := client.Do(req)
+		if err == nil && resp != nil {
+			resp.Body.Close()
+		}
+	}
 }
 
 func handlePaystackInitialize(w http.ResponseWriter, r *http.Request) {
@@ -153,6 +182,7 @@ func handlePaystackCallback(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal(respBody, &verifyResp); err == nil && verifyResp.Status && verifyResp.Data.Status == "success" {
 		// Idempotent recording of verified payment
 		store.IsProcessed("paystack:" + reference)
+		go broadcastRealtimePayment(reference, "success", verifyResp.Data.Amount, "verify")
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -208,6 +238,8 @@ func handlePaystackWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Event processing in real time (e.g. charge.success)
+	go broadcastRealtimePayment(dedupKey, payload.Data.Status, payload.Data.Amount, payload.Event)
+
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Accepted"))
 }

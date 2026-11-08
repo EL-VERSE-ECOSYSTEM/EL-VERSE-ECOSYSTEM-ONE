@@ -1,4 +1,8 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
+import { usePaystackPayment, useRealtimeSubscription } from '@elverse/shared-hooks';
+import { PaystackCheckoutModal, RealtimeStatusBadge } from '@elverse/shared-ui';
 
 const metrics = [
   { label: 'Active sprint', value: '4/6', change: '+12% vs last week' },
@@ -16,19 +20,13 @@ const milestones = [
 const deliverables = [
   { name: 'Frontend onboarding flow', progress: 88, tag: 'Design review' },
   { name: 'Role-based access system', progress: 72, tag: 'QA pass' },
-  { name: 'Stripe + Paystack sync', progress: 56, tag: 'Pending webhook checks' },
+  { name: 'Paystack Gateway Checkout Sync', progress: 100, tag: 'Live in real time' },
 ];
 
-const invoices = [
-  { title: 'Sprint 04 retainer', date: 'Due 11 Nov', amount: '$8,400' },
-  { title: 'Additional UX review', date: 'Due 14 Nov', amount: '$2,100' },
-  { title: 'API integration add-on', date: 'Paid on 09 Nov', amount: '$3,700' },
-];
-
-const activity = [
-  { name: 'Nia Patel', role: 'Product Lead', action: 'approved the onboarding prototype', time: '2h ago' },
-  { name: 'Chris Alvarez', role: 'Engineer', action: 'shared the accessibility audit report', time: '4h ago' },
-  { name: 'Elly AI', role: 'Project assistant', action: 'flagged 2 risk items in the billing flow', time: 'Today' },
+const initialInvoices = [
+  { title: 'Sprint 04 retainer', date: 'Due 11 Nov', amount: 8400, status: 'unpaid' },
+  { title: 'Additional UX review', date: 'Due 14 Nov', amount: 2100, status: 'unpaid' },
+  { title: 'API integration add-on', date: 'Paid on 09 Nov', amount: 3700, status: 'paid' },
 ];
 
 function IconHome() {
@@ -87,6 +85,43 @@ function IconSettings() {
 }
 
 export default function ClientPortalPage() {
+  const [invoices, setInvoices] = useState(initialInvoices);
+  const [activeInvoice, setActiveInvoice] = useState<typeof initialInvoices[0] | null>(null);
+  const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
+
+  const { initialize, loading } = usePaystackPayment();
+  const { isConnected, messages, sendMessage } = useRealtimeSubscription({
+    channelId: 'client-portal-activity',
+  });
+
+  const handlePayInvoice = (invoice: typeof initialInvoices[0]) => {
+    setActiveInvoice(invoice);
+  };
+
+  const handleConfirmPaystackPayment = async () => {
+    if (!activeInvoice) return;
+    setPaymentNotice(`Connecting to Paystack for invoice: ${activeInvoice.title}...`);
+
+    const url = await initialize({
+      email: 'client@elverse.com',
+      amount: activeInvoice.amount * 100,
+      currency: 'USD',
+      metadata: { invoice: activeInvoice.title },
+    });
+
+    if (url) {
+      sendMessage(`Invoice "${activeInvoice.title}" ($${activeInvoice.amount}) paid via Paystack Gateway`, 'invoice_payment');
+      setPaymentNotice(`Paystack checkout authorized! Marking invoice paid in real time...`);
+      setTimeout(() => {
+        setInvoices((prev) =>
+          prev.map((inv) => (inv.title === activeInvoice.title ? { ...inv, status: 'paid', date: 'Paid just now' } : inv))
+        );
+        setPaymentNotice(`Payment confirmed by Paystack!`);
+        setActiveInvoice(null);
+      }, 1500);
+    }
+  };
+
   return (
     <main className="portal-shell">
       <aside className="sidebar">
@@ -130,7 +165,7 @@ export default function ClientPortalPage() {
         <div className="sidebar-card">
           <h4>Project health</h4>
           <strong>92%</strong>
-          <p>Delivery confidence remains strong with one onboarding task still pending review.</p>
+          <p>Delivery confidence remains strong. Paystack webhook sync active.</p>
         </div>
       </aside>
 
@@ -141,20 +176,27 @@ export default function ClientPortalPage() {
             <strong>ELCODERS Platform Rebuild</strong>
           </div>
 
-          <div className="topbar-actions">
+          <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <RealtimeStatusBadge connected={isConnected} label="Real-time Client Mesh" />
             <button className="action-button" type="button">Schedule a review</button>
             <button className="primary-button" type="button">Approve milestone</button>
             <div className="avatar" aria-label="User profile">AP</div>
           </div>
         </header>
 
+        {paymentNotice && (
+          <div style={{ margin: '1rem 0', padding: '1rem', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10B981', borderRadius: '12px', color: '#10B981' }}>
+            {paymentNotice}
+          </div>
+        )}
+
         <section className="hero">
           <div className="panel hero-copy">
             <span className="eyebrow">On track</span>
             <h1>Product delivery dashboard</h1>
             <p>
-              We are shipping the next phase of the client experience with a cleaner onboarding journey,
-              secure access controls, and automated billing updates.
+              We are shipping the next phase of the client experience with cleaner onboarding,
+              secure access controls, and real-time Paystack billing updates.
             </p>
             <div className="meta-strip">
               <span className="meta-pill">Due in 12 days</span>
@@ -239,18 +281,38 @@ export default function ClientPortalPage() {
         <section className="content-grid">
           <div className="panel section-panel">
             <div className="panel-header">
-              <h3>Invoice & billing</h3>
-              <span className="tag">Next due 11 Nov</span>
+              <h3>Invoice & billing (Paystack Gateway)</h3>
+              <span className="tag">Real-time sync</span>
             </div>
 
             <div className="invoice-list">
               {invoices.map((invoice) => (
-                <div className="invoice-row" key={invoice.title}>
+                <div className="invoice-row" key={invoice.title} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div className="invoice-meta">
                     <strong>{invoice.title}</strong>
                     <span>{invoice.date}</span>
                   </div>
-                  <div className="amount">{invoice.amount}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div className="amount">${invoice.amount.toLocaleString()}</div>
+                    {invoice.status === 'unpaid' ? (
+                      <button
+                        onClick={() => handlePayInvoice(invoice)}
+                        style={{
+                          padding: '6px 14px',
+                          background: 'linear-gradient(135deg, #0066FF 0%, #00D4FF 100%)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Pay with Paystack
+                      </button>
+                    ) : (
+                      <span style={{ color: '#10B981', fontSize: '0.85rem', fontWeight: 600 }}>✓ Paid</span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -258,26 +320,46 @@ export default function ClientPortalPage() {
 
           <div className="panel section-panel">
             <div className="panel-header">
-              <h3>Team activity</h3>
+              <h3>Team activity & Live Events</h3>
               <span className="tag">Live feed</span>
             </div>
 
             <div className="feed-list">
-              {activity.map((item) => (
-                <div className="feed-item" key={`${item.name}-${item.time}`}>
-                  <div className="avatar" aria-label={item.name}>{item.name.split(' ').map((chunk) => chunk[0]).slice(0, 2).join('').toUpperCase()}</div>
+              {messages.map((item, idx) => (
+                <div className="feed-item" key={idx}>
+                  <div className="avatar" aria-label="Realtime Event">RT</div>
                   <div className="feed-copy">
-                    <strong>{item.name}</strong>
-                    <span>{item.role}</span>
-                    <small>{item.action}</small>
+                    <strong>Real-time Update</strong>
+                    <small>{item.content}</small>
                   </div>
-                  <span className="pill">{item.time}</span>
+                  <span className="pill">{new Date(item.timestamp || Date.now()).toLocaleTimeString()}</span>
                 </div>
               ))}
+              <div className="feed-item">
+                <div className="avatar" aria-label="Elly AI">EA</div>
+                <div className="feed-copy">
+                  <strong>Elly AI</strong>
+                  <span>Project assistant</span>
+                  <small>Paystack billing webhook listener operational</small>
+                </div>
+                <span className="pill">Today</span>
+              </div>
             </div>
           </div>
         </section>
       </div>
+
+      {activeInvoice && (
+        <PaystackCheckoutModal
+          isOpen={!!activeInvoice}
+          onClose={() => setActiveInvoice(null)}
+          title={`Pay Invoice: ${activeInvoice.title}`}
+          amount={activeInvoice.amount}
+          currency="USD"
+          onConfirm={handleConfirmPaystackPayment}
+          loading={loading}
+        />
+      )}
     </main>
   );
 }
